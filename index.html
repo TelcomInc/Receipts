@@ -1,13 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Employee Receipts</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- ✅ THIS SCRIPT TAG WAS THE MISSING PIECE -->
+  <script src="https://cdn.jsdelivr.net/npm/x.full.min.js
+
   <style>
-    body { font-family: Arial; padding: 20px }
-    input, select, button { margin-bottom: 10px; width: 300px }
-    .receipt { border-bottom: 1px solid #ccc; margin-top: 10px }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, select, button {
+      display: block;
+      margin-bottom: 10px;
+      width: 300px;
+    }
+    .receipt {
+      border-bottom: 1px solid #ccc;
+      margin-top: 10px;
+      padding-bottom: 5px;
+    }
   </style>
 </head>
 
@@ -16,9 +30,9 @@
 <h2>Employee Receipt Submission</h2>
 
 <form id="receiptForm">
-  <input placeholder="Employee Name" required><br>
-  <input placeholder="Vendor" required><br>
-  <input placeholder="Amount" type="number" required><br>
+  <input id="employee" placeholder="Employee Name" required />
+  <input id="vendor" placeholder="Vendor" required />
+  <input id="amount" type="number" placeholder="Amount" required />
 
   <select id="expenseType" required>
     <option value="">Expense Type</option>
@@ -27,16 +41,16 @@
     <option>Training</option>
     <option>Lodging</option>
     <option>Other</option>
-  </select><br>
+  </select>
 
-  <input id="otherDesc" placeholder="Describe Other" style="display:none"><br>
+  <input id="otherDesc" placeholder="Describe Other" style="display:none" />
 
-  <input placeholder="Last 4 Digits of Card" maxlength="4" required><br>
+  <input id="cardLast4" placeholder="Last 4 Digits of Card" maxlength="4" required />
 
-  <button type="submit">Submit</button>
+  <button type="submit">Submit Receipt</button>
 </form>
 
-<hr>
+<hr />
 
 <button onclick="exportExcel()">Export to Excel</button>
 
@@ -45,27 +59,31 @@
 
 <script>
   const receipts = [];
+
   const form = document.getElementById("receiptForm");
   const expenseType = document.getElementById("expenseType");
   const otherDesc = document.getElementById("otherDesc");
   const list = document.getElementById("list");
 
   expenseType.onchange = () => {
-    otherDesc.style.display = expenseType.value === "Other" ? "block" : "none";
+    otherDesc.style.display =
+      expenseType.value === "Other" ? "block" : "none";
   };
 
   form.onsubmit = (e) => {
     e.preventDefault();
-    const data = [...form.elements].map(e => e.value);
-    receipts.push({
-      employee: data[0],
-      vendor: data[1],
-      amount: data[2],
-      type: data[3],
-      description: data[4],
-      card: data[5],
+
+    const receipt = {
+      employee: employee.value,
+      vendor: vendor.value,
+      amount: amount.value,
+      type: expenseType.value,
+      description: otherDesc.value,
+      card: cardLast4.value,
       date: new Date().toLocaleDateString()
-    });
+    };
+
+    receipts.push(receipt);
     render();
     form.reset();
     otherDesc.style.display = "none";
@@ -74,10 +92,12 @@
   function render() {
     list.innerHTML = "";
     receipts.forEach(r => {
-      list.innerHTML += `<div class="receipt">
-        <b>${r.employee}</b> - ${r.vendor} - $${r.amount}<br>
-        ${r.type} - ${r.date} - Card ****${r.card}
-      </div>`;
+      list.innerHTML += `
+        <div class="receipt">
+          <strong>${r.employee}</strong> – ${r.vendor} – $${r.amount}<br/>
+          ${r.type} – ${r.date} – Card ****${r.card}
+        </div>
+      `;
     });
   }
 
@@ -91,3 +111,4 @@
 
 </body>
 </html>
+``
