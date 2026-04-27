@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Receipts</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px }
+    input, select, button { margin-bottom: 10px; width: 300px }
+    .receipt { border-bottom: 1px solid #ccc; margin-top: 10px }
+  </style>
+</head>
+
+<body>
+
+<h2>Employee Receipt Submission</h2>
+
+<form id="receiptForm">
+  <input placeholder="Employee Name" required><br>
+  <input placeholder="Vendor" required><br>
+  <input placeholder="Amount" type="number" required><br>
+
+  <select id="expenseType" required>
+    <option value="">Expense Type</option>
+    <option>Auto</option>
+    <option>Material</option>
+    <option>Training</option>
+    <option>Lodging</option>
+    <option>Other</option>
+  </select><br>
+
+  <input id="otherDesc" placeholder="Describe Other" style="display:none"><br>
+
+  <input placeholder="Last 4 Digits of Card" maxlength="4" required><br>
+
+  <button type="submit">Submit</button>
+</form>
+
+<hr>
+
+<button onclick="exportExcel()">Export to Excel</button>
+
+<h3>Submitted Receipts</h3>
+<div id="list"></div>
+
+<script>
+  const receipts = [];
+  const form = document.getElementById("receiptForm");
+  const expenseType = document.getElementById("expenseType");
+  const otherDesc = document.getElementById("otherDesc");
+  const list = document.getElementById("list");
+
+  expenseType.onchange = () => {
+    otherDesc.style.display = expenseType.value === "Other" ? "block" : "none";
+  };
+
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const data = [...form.elements].map(e => e.value);
+    receipts.push({
+      employee: data[0],
+      vendor: data[1],
+      amount: data[2],
+      type: data[3],
+      description: data[4],
+      card: data[5],
+      date: new Date().toLocaleDateString()
+    });
+    render();
+    form.reset();
+    otherDesc.style.display = "none";
+  };
+
+  function render() {
+    list.innerHTML = "";
+    receipts.forEach(r => {
+      list.innerHTML += `<div class="receipt">
+        <b>${r.employee}</b> - ${r.vendor} - $${r.amount}<br>
+        ${r.type} - ${r.date} - Card ****${r.card}
+      </div>`;
+    });
+  }
+
+  function exportExcel() {
+    const ws = XLSX.utils.json_to_sheet(receipts);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Receipts");
+    XLSX.writeFile(wb, "employee_receipts.xlsx");
+  }
+</script>
+
+</body>
+</html>
